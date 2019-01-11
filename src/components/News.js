@@ -1,40 +1,56 @@
-import React from 'react';
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Article } from './Article' // идти в components не нужно, так как мы уже в этой директории
 
 class News extends React.Component {
-    renderNews = () => {
-      const { data } = this.props;
-      let newsTemplate = null;
-  
-      if (data.length) {
-        newsTemplate = data.map(function(item) {
-          return <Article key={item.id} data={item} />;
-        });
-      } else {
-        newsTemplate = <p>К сожалению новостей нет</p>;
-      }
-  
-      return newsTemplate;
-    };
-    render() {
-      const { data } = this.props;
-  
-      return (
-        <div className="news">
-          {this.renderNews()}
-          {data.length ? (
-            <strong className={"news__count"}>
-              Всего новостей: {data.length}
-            </strong>
-          ) : null}
-        </div>
-      );
-    }
+  state = {
+    filteredNews: this.props.data
   }
-  
-  News.propTypes = {
-    data: PropTypes.array.isRequired
-  };
 
-  export { News } 
+  componentWillReceiveProps (nextProps) {
+    let nextFilteredNews = [...nextProps.data]
+
+    nextFilteredNews.forEach((item, index) => {
+      if (item.bigText.toLowerCase().indexOf('pubg') !== -1) {
+        item.bigText = 'СПАМ'
+      }
+    })
+
+    this.setState({ filteredNews: nextFilteredNews })
+  }
+  renderNews = () => {
+    const { filteredNews } = this.state // используем состояние
+    let newsTemplate = null
+
+    if (filteredNews.length) {
+      // везде data заменена на filteredNews
+      newsTemplate = filteredNews.map(function (item) {
+        return <Article key={item.id} data={item} />
+      })
+    } else {
+      newsTemplate = <p>К сожалению новостей нет</p>
+    }
+
+    return newsTemplate
+  }
+  render () {
+    const { filteredNews } = this.state
+
+    return (
+      <div className='news'>
+        {this.renderNews()}
+        {filteredNews.length ? (
+          <strong className={'news__count'}>
+            Всего новостей: {filteredNews.length}
+          </strong>
+        ) : null}
+      </div>
+    )
+  }
+}
+
+News.propTypes = {
+  data: PropTypes.array.isRequired
+}
+
+export { News }
