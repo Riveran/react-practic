@@ -8,10 +8,27 @@ class App extends React.Component {
     news: null,
     isLoading: false
   }
+
+  static getDerivedStateFromProps (props, state) {
+    let filterNews
+    if (Array.isArray(state.news)) {
+      filterNews = [...state.news]
+      filterNews.forEach(item => {
+        if (item.bigText.toLowerCase().indexOf('pubg') !== 1) {
+          item.bigText = 'СПАМ'
+        }
+      })
+    }
+    return {
+      news: filterNews
+    }
+  }
+
   handleAddNews = data => {
     const nextNews = [data, ...this.state.news]
     this.setState({ news: nextNews })
   }
+
   render () {
     const { news, isLoading } = this.state
     return (
@@ -33,7 +50,7 @@ class App extends React.Component {
       .then(data => {
         setTimeout(() => {
           this.setState({ isLoading: false, news: data })
-        }, 3000)
+        }, 1000)
       })
   }
 }
